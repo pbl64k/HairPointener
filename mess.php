@@ -367,6 +367,7 @@
 	$p->addRequirementByTags('TFB', 'TFB2');
 	$p->addRequirementByTags('TB', 'TBA');
 	$p->addRequirementByTags('TB', 'TBB');
+	//$p->addRequirementByTags('TBB', 'TB');
 
 	$p->getGoalByTag('TF')->setWeight(1);
 	$p->getGoalByTag('TFA')->setWeight(11);
