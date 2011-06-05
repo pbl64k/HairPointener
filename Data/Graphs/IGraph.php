@@ -27,6 +27,9 @@
 			public function getMinDepthByTag($vertexTag);
 			public function getMaxHeightByTag($vertexTag);
 			public function getMinHeightByTag($vertexTag);
+			public function getWidthByTag($vertexTag);
+			public function sequenceArcByTags($sourceVertexTag, $targetVertexTag, ArrayMonad $vertices);
+			public function parallelizeArcByTags($sourceVertexTag, $targetVertexTag, ArrayMonad $vertices);
 
 			public function notifyVertexTagChange(IVertex $vertex);
 		}

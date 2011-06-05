@@ -6,6 +6,8 @@
 	require_once(dirname(__FILE__).'/HairPointener/Resources/HumanResource.php');
 	require_once(dirname(__FILE__).'/HairPointener/Resources/OrgChart.php');
 
+	require_once(dirname(__FILE__).'/View/Svg/SimpleAcyclicDigraphTreeView.php');
+
 	$hpChart = \HairPointener\Resources\OrgChart::make();
 
 	$hpChart->addVertex(\HairPointener\Resources\HumanResource::make('HR_RB', 'R.B.', 'CTO'));
@@ -33,6 +35,7 @@
 
 	//print_r($hpChart);
 
+	/*
 	$maxDepths = $hpChart->getAllTags()->mfmap(function($tag) use($hpChart) { return array('tag' => $tag, 'maxDepth' => $hpChart->getMaxDepthByTag($tag)); })->pierceMonad();
 
 	$depthGroups = array();
@@ -48,5 +51,12 @@
 	}
 
 	print_r($depthGroups);
+	*/
+
+	$view = \View\Svg\SimpleAcyclicDigraphTreeView::make($hpChart);
+
+	$xml = $view->makeLayout()->generate()->serializeXml();
+
+	print($xml);
 
 ?>

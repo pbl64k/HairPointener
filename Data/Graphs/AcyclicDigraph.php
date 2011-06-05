@@ -297,6 +297,21 @@
 				return min($this->getChildTagsByTag($vertexTag)->mfmap(function($tag) use($graph) { return $graph->getMinHeightByTag($tag) + 1; })->pierceMonad());
 			}
 	
+			final public function getWidthByTag($vertexTag)
+			{
+				assert(FALSE);
+			}
+
+			final public function sequenceArcByTags($sourceVertexTag, $targetVertexTag, ArrayMonad $vertices)
+			{
+				assert(FALSE);
+			}
+
+			final public function parallelizeArcByTags($sourceVertexTag, $targetVertexTag, ArrayMonad $vertices)
+			{
+				assert(FALSE);
+			}
+
 			// this is broken horribly, we need to reseat the arcs if this ever happens.
 			final public function notifyVertexTagChange(IVertex $vertex)
 			{

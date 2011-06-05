@@ -10,6 +10,11 @@
 
 			abstract public function generate();
 
+			final public function serializeXml()
+			{
+				return $this->dom->saveXML();
+			}
+
 			protected function __construct()
 			{
 				$this->initDom()->setNs();
@@ -17,7 +22,7 @@
 
 			final protected function initDom()
 			{
-				$this->dom = new DOMDocument;
+				$this->dom = new \DOMDocument;
 
 				array_push($this->context, $this->dom);
 
@@ -46,7 +51,8 @@
 
 			final protected function genAttr($name, $ns = NULL)
 			{
-				$namespace = is_null($ns) ? $this->ns : $ns;
+				//$namespace = is_null($ns) ? $this->ns : $ns;
+				$namespace = is_null($ns) ? '' : $ns;
 
 				$attr = $this->dom->createAttributeNS($namespace, $name);
 
@@ -68,9 +74,7 @@
 			{
 				$this->genElt($name, $ns);
 
-				$textNode = $this->dom->createTextNode(strval($value));
-
-				$this->context[count($this->context) - 1]->appendChild($textNode);
+				$this->genTxt($value);
 
 				return $this->up();
 			}
@@ -79,11 +83,18 @@
 			{
 				$this->genAttr($name, $ns);
 
+				$this->genTxt($value);
+
+				return $this->up();
+			}
+
+			final protected function genTxt($value = NULL)
+			{
 				$textNode = $this->dom->createTextNode(strval($value));
 
 				$this->context[count($this->context) - 1]->appendChild($textNode);
 
-				return $this->up();
+				return $this;
 			}
 		}
 	}
