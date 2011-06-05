@@ -2,13 +2,15 @@
 
 	namespace Control\Monads
 	{
+		require_once(dirname(__FILE__).'/AbstractMonad.php');
+
 		class ArrayMonad extends AbstractMonad implements IMonad
 		{
 			private $array;
 
-			static public function makeFromArray(array $m)
+			static public function makeFromArray(array $array)
 			{
-				return new self($m);
+				return new self($array);
 			}
 
 			public function pierceMonad()
@@ -23,12 +25,17 @@
 
 			public function mjoin()
 			{
-				return self::makeFromArray(call_user_func_array('array_merge', $this->array));
+				if (empty($this->array))
+				{
+					return self::makeFromArray(array());
+				}
+
+				return self::makeFromArray(call_user_func_array('array_merge', array_map(function($m) { return $m->pierceMonad(); }, $this->array)));
 			}
 
 			public function mfmap($f)
 			{
-				return self::makeFromArray(array_map(function($x) { return $f($x); }, $this->array));
+				return self::makeFromArray(array_map($f, $this->array));
 			}
 
 			private function __construct(array $m)

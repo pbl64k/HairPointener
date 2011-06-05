@@ -2,10 +2,10 @@
 
 	namespace Control\Monads
 	{
+		require_once(dirname(__FILE__).'/../../FP/Lude.php');
+
 		abstract class AbstractMonad
 		{
-			abstract public function mreturn($x);
-
 			public function mbind($f)
 			{
 				return $this->mfmap($f)->mjoin();
@@ -13,12 +13,14 @@
 
 			public function mjoin()
 			{
-				return $this->mbind(function($x) { return $x; });
+				return $this->mbind(\FP\f::id());
 			}
 
 			public function mfmap($f)
 			{
-				return $this->mbind(function(x) use($this, $f) { return $this->mreturn($f($x)); });
+				$m = $this;
+
+				return $this->mbind(${${\FP\f::compose()}(function($x) use($m) { return $m->mreturn($x); })}($f));
 			}
 		}
 	}

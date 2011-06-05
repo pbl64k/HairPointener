@@ -85,28 +85,28 @@
 				return $this->vertices[$vertexTag];
 			}
 
-			final public function getChildrenByTag($vertexTag)
+			final public function getChildTagsByTag($vertexTag)
 			{
 				assert($this->existsVertexByTag($vertexTag));
 
 				assert(FALSE);
 			}
 	
-			final public function getParentsByTag($vertexTag)
+			final public function getParentTagsByTag($vertexTag)
 			{
 				assert($this->existsVertexByTag($vertexTag));
 
 				assert(FALSE);
 			}
 	
-			final public function getDescendantsByTag($vertexTag)
+			final public function getDescendantTagsByTag($vertexTag)
 			{
 				assert($this->existsVertexByTag($vertexTag));
 
 				assert(FALSE);
 			}
 	
-			final public function getAncestorsByTag($vertexTag)
+			final public function getAncestorTagsByTag($vertexTag)
 			{
 				assert($this->existsVertexByTag($vertexTag));
 
