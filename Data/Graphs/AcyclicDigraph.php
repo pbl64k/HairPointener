@@ -57,28 +57,6 @@
 			{
 				$this->checkVertexExistenceByTag($vertexTag)->removeAllArcsByTag($vertexTag);
 	
-				/*
-				if (array_key_exists($tag, $this->reqs))
-				{
-					foreach ($this->reqs[$tag] as $depTag)
-					{
-						$this->sqer[$depTag] = array_filter($this->sqer[$depTag], function($t) use ($tag) { return $t === $t; } );
-					}
-	
-					unset($this->reqs[$tag]);
-				}
-	
-				if (array_key_exists($tag, $this->sqer))
-				{
-					foreach ($this->sqer[$tag] as $goalTag)
-					{
-						$this->reqs[$goalTag] = array_filter($this->reqs[$goalTag], function($t) use ($tag) { return $t === $t; } );
-					}
-	
-					unset($this->sqer[$tag]);
-				}
-				*/
-
 				$this->getVertexByTag($vertexTag)->detach();
 
 				unset($this->vertices[$vertexTag]);
@@ -92,16 +70,20 @@
 	
 				$this->checkNonconnectednessByTags($sourceVertexTag, $targetVertexTag)->checkNonconnectednessByTags($targetVertexTag, $sourceVertexTag);
 	
-				if (! array_key_exists($sourceVertexTag, $this->arcs))
+				if ($this->isOrphanByTag($sourceVertexTag))
 				{
 					$this->arcs[$sourceVertexTag] = array();
+
+					unset($this->orphans[$sourceVertexTag]);
 				}
 	
 				$this->arcs[$sourceVertexTag][] = $targetVertexTag;
 	
-				if (! array_key_exists($targetVertexTag, $this->scra))
+				if ($this->isNahproByTag($targetVertexTag))
 				{
 					$this->scra[$targetVertexTag] = array();
+
+					unset($this->snahpro[$targetVertexTag]);
 				}
 	
 				$this->scra[$targetVertexTag][] = $targetVertexTag;
@@ -232,8 +214,18 @@
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
 
-				assert(FALSE);
+				if (! $this->isOrphanByTag($vertexTag))
+				{
+					foreach ($this->arcs[$vertexTag] as $targetTag)
+					{
+						$this->scra[$targetTag] = array_filter($this->scra[$targetTag], function($tag) use ($vertexTag) { return $tag !== $vertexTag; } );
+					}
+	
+					unset($this->arcs[$vertexTag]);
 
+					$this->orphans[$vertexTag] = TRUE;
+				}
+	
 				return $this;
 			}
 
@@ -241,7 +233,17 @@
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
 
-				assert(FALSE);
+				if (! $this->isNahproByTag($vertexTag))
+				{
+					foreach ($this->scra[$vertexTag] as $sourceTag)
+					{
+						$this->arcs[$sourceTag] = array_filter($this->arcs[$sourceTag], function($tag) use ($vertexTag) { return $tag !== $vertexTag; } );
+					}
+	
+					unset($this->scra[$vertexTag]);
+
+					$this->snahpro[$vertexTag] = TRUE;
+				}
 
 				return $this;
 			}
