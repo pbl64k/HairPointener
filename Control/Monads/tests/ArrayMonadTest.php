@@ -10,21 +10,43 @@
 		class ArrayMonadTest extends \PHPUnit_Framework_TestCase
 		{
 			/**
+			 * @test
 			 * @dataProvider provideArray
 			 */
-			public function testCreateAndJuggle(array $array)
+			public function checkCreateAndJuggle(array $array)
 			{
 				$monad = \Control\Monads\ArrayMonad::makeFromArray($array);
 
 				$this->assertEquals($array, $monad->pierceMonad());
 
+				$this->checkMreturn($monad);
+
+				$this->checkMfmap($monad);
+
+				$this->checkMbind($monad);
+
+				return $monad;
+			}
+
+			public function checkMreturn(\Control\Monads\ArrayMonad $monad)
+			{
 				$this->assertEquals(array($monad->pierceMonad()), $monad->mreturn($monad->pierceMonad())->pierceMonad());
 
-				$this->assertEquals(array_map(function($x) { return 2 * $x; }, $array), $monad->mfmap(function($y) { return $y + $y; })->pierceMonad());
+				return $monad;
+			}
 
+			public function checkMfmap(\Control\Monads\ArrayMonad $monad)
+			{
+				$this->assertEquals(array_map(function($x) { return 2 * $x; }, $monad->pierceMonad()), $monad->mfmap(function($y) { return $y + $y; })->pierceMonad());
+
+				return $monad;
+			}
+
+			public function checkMbind(\Control\Monads\ArrayMonad $monad)
+			{
 				$dup = array();
 
-				foreach ($array as $elt)
+				foreach ($monad->pierceMonad() as $elt)
 				{
 					$dup[] = $elt;
 					$dup[] = $elt;
