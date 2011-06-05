@@ -6,8 +6,8 @@
 
 		interface IArc
 		{
-			public function getSourceVertex();
-			public function getTargetVertex();
+			public function getSourceVertexTag();
+			public function getTargetVertexTag();
 		}
 	}
 

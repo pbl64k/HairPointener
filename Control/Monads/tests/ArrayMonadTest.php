@@ -4,11 +4,21 @@
 	{
 		require_once('PHPUnit/Framework/TestCase.php');
 
-		require_once(dirname(__FILE__).'/../IMonad.php');
 		require_once(dirname(__FILE__).'/../ArrayMonad.php');
 
 		class ArrayMonadTest extends \PHPUnit_Framework_TestCase
 		{
+			public function provideArray()
+			{
+				return array(
+						array(array()),
+						array(array(0,)),
+						array(array(1,)),
+						array(array(1, 2, 3,)),
+						array(array(1, 1, 2, 3, 5, 8, 13, 21,)),
+						);
+			}
+
 			/**
 			 * @test
 			 * @dataProvider provideArray
@@ -28,21 +38,21 @@
 				return $monad;
 			}
 
-			public function checkMreturn(\Control\Monads\ArrayMonad $monad)
+			private function checkMreturn(\Control\Monads\ArrayMonad $monad)
 			{
 				$this->assertEquals(array($monad->pierceMonad()), $monad->mreturn($monad->pierceMonad())->pierceMonad());
 
 				return $monad;
 			}
 
-			public function checkMfmap(\Control\Monads\ArrayMonad $monad)
+			private function checkMfmap(\Control\Monads\ArrayMonad $monad)
 			{
 				$this->assertEquals(array_map(function($x) { return 2 * $x; }, $monad->pierceMonad()), $monad->mfmap(function($y) { return $y + $y; })->pierceMonad());
 
 				return $monad;
 			}
 
-			public function checkMbind(\Control\Monads\ArrayMonad $monad)
+			private function checkMbind(\Control\Monads\ArrayMonad $monad)
 			{
 				$dup = array();
 
@@ -55,17 +65,6 @@
 				$this->assertEquals($dup, $monad->mbind(function ($x) { return \Control\Monads\ArrayMonad::makeFromArray(array($x, $x)); })->pierceMonad());
 
 				return $monad;
-			}
-
-			public function provideArray()
-			{
-				return array(
-						array(array()),
-						array(array(0,)),
-						array(array(1,)),
-						array(array(1, 2, 3,)),
-						array(array(1, 1, 2, 3, 5, 8, 13, 21,)),
-						);
 			}
 		}
 	}

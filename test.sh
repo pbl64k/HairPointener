@@ -1,3 +1,5 @@
 #!/bin/sh
-phpunit `find . -name 'tests'`
+for TEST in `find . -name 'tests'` ; do
+	phpunit $TEST ;
+done
 

@@ -1,8 +1,8 @@
 <?php
 
-	namespace \Data\Graphs\Exceptions
+	namespace Data\Graphs\Exceptions
 	{
-		abstract class AbstractException extends Exception
+		abstract class AbstractException extends \Exception
 		{
 		}
 	}

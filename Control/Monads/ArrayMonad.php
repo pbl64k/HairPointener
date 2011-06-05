@@ -2,6 +2,7 @@
 
 	namespace Control\Monads
 	{
+		require_once(dirname(__FILE__).'/IMonad.php');
 		require_once(dirname(__FILE__).'/AbstractMonad.php');
 
 		class ArrayMonad extends AbstractMonad implements IMonad

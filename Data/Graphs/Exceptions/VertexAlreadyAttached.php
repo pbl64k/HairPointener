@@ -4,7 +4,7 @@
 	{
 		require_once(dirname(__FILE__).'/AbstractException.php');
 
-		class VertexDoesNotExist extends AbstractException
+		class VertexAlreadyAttached extends AbstractException
 		{
 		}
 	}

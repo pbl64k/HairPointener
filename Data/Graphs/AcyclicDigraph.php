@@ -2,9 +2,13 @@
 
 	namespace Data\Graphs
 	{
+		require_once(dirname(__FILE__).'/../../Control/Monads/ArrayMonad.php');
+
 		require_once(dirname(__FILE__).'/IVertex.php');
 		require_once(dirname(__FILE__).'/IArc.php');
 		require_once(dirname(__FILE__).'/IGraph.php');
+
+		require_once(dirname(__FILE__).'/SimpleArc.php');
 
 		require_once(dirname(__FILE__).'/Exceptions/InvalidTag.php');
 		require_once(dirname(__FILE__).'/Exceptions/VertexDoesNotExist.php');
@@ -59,7 +63,7 @@
 	
 				$this->getVertexByTag($vertexTag)->detach();
 
-				unset($this->vertices[$vertexTag]);
+				unset ($this->vertices[$vertexTag]);
 	
 				return $this;
 			}
@@ -74,7 +78,7 @@
 				{
 					$this->arcs[$sourceVertexTag] = array();
 
-					unset($this->orphans[$sourceVertexTag]);
+					unset ($this->orphans[$sourceVertexTag]);
 				}
 	
 				$this->arcs[$sourceVertexTag][] = $targetVertexTag;
@@ -83,10 +87,10 @@
 				{
 					$this->scra[$targetVertexTag] = array();
 
-					unset($this->snahpro[$targetVertexTag]);
+					unset ($this->snahpro[$targetVertexTag]);
 				}
 	
-				$this->scra[$targetVertexTag][] = $targetVertexTag;
+				$this->scra[$targetVertexTag][] = $sourceVertexTag;
 	
 				return $this;
 			}
@@ -95,7 +99,7 @@
 			{
 				$this->checkVertexExistenceByTag($sourceVertexTag)->checkVertexExistenceByTag($targetVertexTag);
 				
-				if (array_key_exists($targetVertexTag, $this->scra))
+				if (! $this->isOrphanByTag($sourceVertexTag))
 				{
 					foreach ($this->arcs[$sourceVertexTag] as $arcEndTag)
 					{
@@ -104,7 +108,7 @@
 							return TRUE;
 						}
 	
-						if ($this->isConnectedToByTag($arcEndTag, $targetVertexTag))
+						if ($this->isConnectedToByTags($arcEndTag, $targetVertexTag))
 						{
 							return TRUE;
 						}
@@ -114,18 +118,107 @@
 				return FALSE;
 			}
 
+			final public function isOrphanByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return array_key_exists($vertexTag, $this->orphans);
+			}
+
+			final public function isNahproByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return array_key_exists($vertexTag, $this->snahpro);
+			}
+
+			final public function getChildTagsByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isNahproByTag($vertexTag))
+				{
+					return \Control\Monads\ArrayMonad::makeFromArray(array());
+				}
+
+				return \Control\Monads\ArrayMonad::makeFromArray($this->scra[$vertexTag]);
+			}
+	
+			final public function getParentTagsByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isOrphanByTag($vertexTag))
+				{
+					return \Control\Monads\ArrayMonad::makeFromArray(array());
+				}
+
+				return \Control\Monads\ArrayMonad::makeFromArray($this->arcs[$vertexTag]);
+			}
+
+			final public function getArcsByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return $this->getParentTagsByTag($vertexTag)->mfmap(function($parentTag) use($vertexTag) { return SimpleArc::makeByTags($vertexTag, $parentTag); });
+			}
+	
+			final public function getScraByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return $this->getChildTagsByTag($vertexTag)->mfmap(function($childTag) use($vertexTag) { return SimpleArc::makeByTags($childTag, $vertexTag); });
+			}
+	
+			final public function getDescendantTagsByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				assert(FALSE);
+			}
+	
+			final public function getAncestorTagsByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				assert(FALSE);
+			}
+
+			final public function getIndegreeByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return count($this->getChildByTag($vertexTag)->pierceMonad());
+			}
+	
+			final public function getOutdegreeByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				return count($this->getParentTagsByTag($vertexTag)->pierceMonad());
+			}
+	
+			// this is broken horribly, we need to reseat the arcs if this ever happens.
 			final public function notifyVertexTagChange(IVertex $vertex)
 			{
-				$this->checkVertexValidity($vertex)->checkVertexExistenceByTag($vertex->getOldTag())->removeVertexByTag($vertex->getOldTag());
+				assert(FALSE);
+				$this->checkVertexValidity($vertex)->checkVertexExistenceByTag($vertex->getOldTag())->checkVertexNonexistenceByTag($vertex->getTag());
 	
-				$this->checkVertexValidity($vertex)->checkVertexNonexistenceByTag($vertex->getTag());
+				$this->removeVertexByTag($vertex->getOldTag());
+
+				$this->checkVertexValidity($tag);
 	
 				$this->vertices[$vertex->getTag()] = $vertex;
 	
 				return $this;
 			}
 
-			final private function isWellFormedVertexTag($vertexTag)
+			protected function isValidVertex(IVertex $vertex)
+			{
+				return TRUE;
+			}
+
+			protected function isWellFormedVertexTag($vertexTag)
 			{
 				return is_string($vertexTag);
 			}
@@ -136,11 +229,6 @@
 				{
 					throw new Exceptions\InvalidTag($vertexTag);
 				}
-			}
-
-			final private function isValidVertex(IVertex $vertex)
-			{
-				return TRUE;
 			}
 
 			final private function checkVertexValidity(IVertex $vertex)
@@ -168,48 +256,6 @@
 				return $this;
 			}
 	
-			final private function isOrphanByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				return array_key_exists($vertexTag, $this->orphans);
-			}
-
-			final private function isNahproByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				return array_key_exists($vertexTag, $this->snahpro);
-			}
-
-			final private function getChildTagsByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				assert(FALSE);
-			}
-	
-			final private function getParentTagsByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				assert(FALSE);
-			}
-	
-			final private function getDescendantTagsByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				assert(FALSE);
-			}
-	
-			final private function getAncestorTagsByTag($vertexTag)
-			{
-				$this->checkVertexExistenceByTag($vertexTag);
-
-				assert(FALSE);
-			}
-	
 			final private function removeAllArcsByTag($vertexTag)
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
@@ -221,7 +267,7 @@
 						$this->scra[$targetTag] = array_filter($this->scra[$targetTag], function($tag) use ($vertexTag) { return $tag !== $vertexTag; } );
 					}
 	
-					unset($this->arcs[$vertexTag]);
+					unset ($this->arcs[$vertexTag]);
 
 					$this->orphans[$vertexTag] = TRUE;
 				}
@@ -240,7 +286,7 @@
 						$this->arcs[$sourceTag] = array_filter($this->arcs[$sourceTag], function($tag) use ($vertexTag) { return $tag !== $vertexTag; } );
 					}
 	
-					unset($this->scra[$vertexTag]);
+					unset ($this->scra[$vertexTag]);
 
 					$this->snahpro[$vertexTag] = TRUE;
 				}
@@ -255,7 +301,7 @@
 	
 			final private function checkNonconnectednessByTags($sourceVertexTag, $targetVertexTag)
 			{
-				if ($this->isConnectedByTags($sourceVertexTag, $targetVertexTag))
+				if ($this->isConnectedToByTags($sourceVertexTag, $targetVertexTag))
 				{
 					throw new Exceptions\VerticesAlreadyConnectedByAnArc(array($sourceVertecTag, $targetVertexTag));
 				}
