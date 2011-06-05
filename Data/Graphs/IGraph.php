@@ -1,6 +1,6 @@
 <?php
 
-	namespace HairPointener\Graphs
+	namespace Data\Graphs
 	{
 		interface IGraph
 		{

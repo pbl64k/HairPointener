@@ -1,6 +1,6 @@
 <?php
 
-	namespace HairPointener\Graphs
+	namespace Data\Graphs
 	{
 		require_once(dirname(__FILE__).'/IVertex.php');
 

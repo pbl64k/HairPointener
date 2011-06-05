@@ -1,6 +1,6 @@
 <?php
 
-	namespace HairPointener\Graphs
+	namespace Data\Graphs
 	{
 		require_once(dirname(__FILE__).'/IVertex.php');
 		require_once(dirname(__FILE__).'/IArc.php');
@@ -9,6 +9,8 @@
 		{
 			private $vertices = array();
 	
+			private $orphans = array();
+			private $snahpro = array();
 			private $arcs = array();
 			private $scra = array();
 	
@@ -30,20 +32,29 @@
 				return $this;
 			}
 
+			final public function isWellFormedVertexTag($vertexTag)
+			{
+				return is_string($vertexTag);
+			}
+	
+			final public function isValidVertex(IVertex $vertex)
+			{
+				return TRUE;
+			}
+
 			final public function addVertex(IVertex $vertex)
 			{
 				assert(! $this->existsVertexByTag($vertex->getTag()));
+				assert($this->isValidVertex($vertex));
 	
+				$this->orphans[$vertex->getTag()] = TRUE;
+				$this->snahpro[$vertex->getTag()] = TRUE;
+
 				$this->vertices[$vertex->getTag()] = $vertex;
 	
 				$vertex->attachTo($this);
 	
 				return $this;
-			}
-	
-			final public function isWellFormedVertexTag($vertexTag)
-			{
-				return is_string($vertexTag);
 			}
 	
 			final public function existsVertexByTag($vertexTag)
@@ -53,11 +64,53 @@
 				return array_key_exists($vertexTag, $this->vertices);
 			}
 	
+			final public function isOrphanByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				return array_key_exists($vertexTag, $this->orphans);
+			}
+
+			final public function isNahproByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				return array_key_exists($vertexTag, $this->snahpro);
+			}
+
 			final public function getVertexByTag($vertexTag)
 			{
 				assert($this->existsVertexByTag($vertexTag));
 	
 				return $this->vertices[$vertexTag];
+			}
+
+			final public function getChildrenByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
+			}
+	
+			final public function getParentsByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
+			}
+	
+			final public function getDescendantsByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
+			}
+	
+			final public function getAncestorsByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
 			}
 	
 			final public function removeVertexByTag($vertexTag)
@@ -92,6 +145,34 @@
 
 				unset($this->vertices[$vertexTag]);
 	
+				return $this;
+			}
+
+			final public function removeAllArcsByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
+
+				return $this;
+			}
+
+			final public function removeAllScraByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				assert(FALSE);
+
+				return $this;
+			}
+
+			final public function removeAllConnectionsByTag($vertexTag)
+			{
+				assert($this->existsVertexByTag($vertexTag));
+
+				$this->removeAllArcsByTag($vertexTag);
+				$this->removeAllScraByTag($vertexTag);
+
 				return $this;
 			}
 	
