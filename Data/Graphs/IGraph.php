@@ -12,6 +12,8 @@
 			public function isConnectedToByTags($sourceVertexTag, $targetVertexTag);
 			public function isOrphanByTag($vertexTag);
 			public function isNahproByTag($vertexTag);
+			public function getNahproTags();
+			public function getOrphanTags();
 			public function getChildTagsByTag($vertexTag);
 			public function getParentTagsByTag($vertexTag);
 			public function getArcsByTag($vertexTag);

@@ -98,6 +98,11 @@
 			final public function isConnectedToByTags($sourceVertexTag, $targetVertexTag)
 			{
 				$this->checkVertexExistenceByTag($sourceVertexTag)->checkVertexExistenceByTag($targetVertexTag);
+
+				if ($sourceVertexTag === $targetVertexTag)
+				{
+					return TRUE;
+				}
 				
 				if (! $this->isOrphanByTag($sourceVertexTag))
 				{
@@ -130,6 +135,16 @@
 				$this->checkVertexExistenceByTag($vertexTag);
 
 				return array_key_exists($vertexTag, $this->snahpro);
+			}
+
+			final public function getNahproTags()
+			{
+				return \Control\Monads\ArrayMonad::makeFromArray(array_keys($this->snahpro));
+			}
+
+			final public function getOrphanTags()
+			{
+				return \Control\Monads\ArrayMonad::makeFromArray(array_keys($this->orphans));
 			}
 
 			final public function getChildTagsByTag($vertexTag)
@@ -174,21 +189,35 @@
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
 
-				assert(FALSE);
+				$graph = $this;
+
+				return $this->getChildTagsByTag($vertexTag)->mbind(
+						function($tag) use($graph)
+						{
+							return $graph->getDescendantTagsByTag($tag)->mplus(\Control\Monads\ArrayMonad::makeFromArray(array($tag)));
+						}
+						);
 			}
 	
 			final public function getAncestorTagsByTag($vertexTag)
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
 
-				assert(FALSE);
+				$graph = $this;
+
+				$parents = $this->getParentTagsByTag($vertexTag)->mbind(
+						function($tag) use($graph)
+						{
+							return $graph->getAncestorTagsByTag($tag)->mplus(\Control\Monads\ArrayMonad::makeFromArray(array($tag)));
+						}
+						);
 			}
 
 			final public function getIndegreeByTag($vertexTag)
 			{
 				$this->checkVertexExistenceByTag($vertexTag);
 
-				return count($this->getChildByTag($vertexTag)->pierceMonad());
+				return count($this->getChildTagsByTag($vertexTag)->pierceMonad());
 			}
 	
 			final public function getOutdegreeByTag($vertexTag)
@@ -213,6 +242,10 @@
 				return $this;
 			}
 
+			protected function __construct()
+			{
+			}
+	
 			protected function isValidVertex(IVertex $vertex)
 			{
 				return TRUE;
@@ -303,14 +336,10 @@
 			{
 				if ($this->isConnectedToByTags($sourceVertexTag, $targetVertexTag))
 				{
-					throw new Exceptions\VerticesAlreadyConnectedByAnArc(array($sourceVertecTag, $targetVertexTag));
+					throw new Exceptions\VerticesAlreadyConnected(serialize(array($sourceVertexTag, $targetVertexTag)));
 				}
 
 				return $this;
-			}
-	
-			final private function __construct()
-			{
 			}
 		}
 	}

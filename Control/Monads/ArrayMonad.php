@@ -2,10 +2,10 @@
 
 	namespace Control\Monads
 	{
-		require_once(dirname(__FILE__).'/IMonad.php');
+		require_once(dirname(__FILE__).'/IMonadPlus.php');
 		require_once(dirname(__FILE__).'/AbstractMonad.php');
 
-		class ArrayMonad extends AbstractMonad implements IMonad
+		class ArrayMonad extends AbstractMonad implements IMonadPlus
 		{
 			private $array;
 
@@ -37,6 +37,23 @@
 			public function mfmap($f)
 			{
 				return self::makeFromArray(array_map($f, $this->array));
+			}
+
+			public function mzero()
+			{
+				return self::makeFromArray(array());
+			}
+
+			public function mplus($m)
+			{
+				$monad = $this->mplusHelper($m);
+
+				return self::makeFromArray(array_merge($this->pierceMonad(), $monad->pierceMonad()));
+			}
+
+			protected function mplusHelper(ArrayMonad $m)
+			{
+				return $m;
 			}
 
 			private function __construct(array $m)
