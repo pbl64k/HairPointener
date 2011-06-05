@@ -24,7 +24,7 @@
 			private $arcs = array();
 			private $scra = array();
 	
-			final static public function make()
+			static public function make()
 			{
 				return new self;
 			}
@@ -40,6 +40,15 @@
 	
 				$vertex->attachTo($this);
 	
+				return $this;
+			}
+
+			final public function addChildVertex($parentTag, IVertex $vertex)
+			{
+				$this->checkVertexExistenceByTag($parentTag)->checkVertexValidity($vertex)->checkVertexNonexistenceByTag($vertex->getTag());
+
+				$this->addVertex($vertex)->addArcByTags($vertex->getTag(), $parentTag);
+
 				return $this;
 			}
 	
@@ -121,6 +130,11 @@
 				}
 	
 				return FALSE;
+			}
+
+			final public function getAllTags()
+			{
+				return \Control\Monads\ArrayMonad::makeFromArray(array_keys($this->vertices));
 			}
 
 			final public function isOrphanByTag($vertexTag)
@@ -225,6 +239,62 @@
 				$this->checkVertexExistenceByTag($vertexTag);
 
 				return count($this->getParentTagsByTag($vertexTag)->pierceMonad());
+			}
+	
+			final public function getMaxDepthByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isOrphanByTag($vertexTag))
+				{
+					return 0;
+				}
+
+				$graph = $this;
+
+				return max($this->getParentTagsByTag($vertexTag)->mfmap(function($tag) use($graph) { return $graph->getMaxDepthByTag($tag) + 1; })->pierceMonad());
+			}
+	
+			final public function getMinDepthByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isOrphanByTag($vertexTag))
+				{
+					return 0;
+				}
+
+				$graph = $this;
+
+				return min($this->getParentTagsByTag($vertexTag)->mfmap(function($tag) use($graph) { return $graph->getMinDepthByTag($tag) + 1; })->pierceMonad());
+			}
+	
+			final public function getMaxHeightByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isNahproByTag($vertexTag))
+				{
+					return 0;
+				}
+
+				$graph = $this;
+
+				return max($this->getChildTagsByTag($vertexTag)->mfmap(function($tag) use($graph) { return $graph->getMaxHeightByTag($tag) + 1; })->pierceMonad());
+			}
+	
+			final public function getMinHeightByTag($vertexTag)
+			{
+				$this->checkVertexExistenceByTag($vertexTag);
+
+				if ($this->isNahproByTag($vertexTag))
+				{
+					return 0;
+				}
+
+				$graph = $this;
+
+				return min($this->getChildTagsByTag($vertexTag)->mfmap(function($tag) use($graph) { return $graph->getMinHeightByTag($tag) + 1; })->pierceMonad());
 			}
 	
 			// this is broken horribly, we need to reseat the arcs if this ever happens.

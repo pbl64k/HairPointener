@@ -16,7 +16,7 @@
 	
 			private $description = '';
 	
-			final static public function make($tag)
+			static public function make($tag)
 			{
 				$vertex = new self;
 	
