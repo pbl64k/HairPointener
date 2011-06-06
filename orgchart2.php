@@ -6,12 +6,13 @@
 	require_once(dirname(__FILE__).'/HairPointener/Resources/HumanResource.php');
 	require_once(dirname(__FILE__).'/HairPointener/Resources/OrgChart.php');
 
+	require_once(dirname(__FILE__).'/View/Svg/SimpleRectRenderer.php');
 	require_once(dirname(__FILE__).'/View/Svg/SimpleAcyclicDigraphTreeView.php');
 
 	$hpChart = \HairPointener\Resources\OrgChart::make();
 
 	$hpChart->addVertex(\HairPointener\Resources\HumanResource::make('HR_RB', 'R.B.', 'CTO'));
-	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_IK', 'I.K.', 'Deputy CTO'));
+	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_IK', 'I.K.', 'Infrastructure Analyst'));
 	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_VP', 'V.P.', 'System Administrator'));
 	$hpChart->addChildVertex('HR_VP', \HairPointener\Resources\HumanResource::make('HR_VK', 'V.K.', 'Helpdesk Team Lead'));
 	$hpChart->addChildVertex('HR_VK', \HairPointener\Resources\HumanResource::make('HR_IK_HD', 'I.K.', 'Helpdesk Staff Member'));
@@ -19,12 +20,12 @@
 	$hpChart->addChildVertex('HR_AL', \HairPointener\Resources\HumanResource::make('HR_VB', 'V.B.', 'Software Engineer'));
 	$hpChart->addChildVertex('HR_AL', \HairPointener\Resources\HumanResource::make('HR_AX', 'A.X.', 'Jr. Software Engineer'));
 	$hpChart->addChildVertex('HR_AL', \HairPointener\Resources\HumanResource::make('HR_SG', 'S.G.', 'QA Engineer'));
-	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_ML', 'M.L.', 'Advertisement & Promotion Manager, TRL'));
-	$hpChart->addChildVertex('HR_ML', \HairPointener\Resources\HumanResource::make('HR_AP_AD', 'A.P.', 'Advertisement & Promotion Analyst'));
-	$hpChart->addChildVertex('HR_ML', \HairPointener\Resources\HumanResource::make('HR_EL', 'E.L.', 'Advertisement & Promotion Analyst'));
-	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_EB', 'E.B.', 'Advertisement & Promotion Analyst'));
+	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_ML', 'M.L.', 'Promotion Manager, TRL'));
+	$hpChart->addChildVertex('HR_ML', \HairPointener\Resources\HumanResource::make('HR_AP_AD', 'A.P.', 'Promotion Analyst'));
+	$hpChart->addChildVertex('HR_ML', \HairPointener\Resources\HumanResource::make('HR_EL', 'E.L.', 'Promotion Analyst'));
+	$hpChart->addChildVertex('HR_ML', \HairPointener\Resources\HumanResource::make('HR_EB', 'E.B.', 'Promotion Analyst'));
 	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_EM', 'E.M.', 'Project Manager, YAT'));
-	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_PL', 'P.L.', 'Software Development Manager'));
+	$hpChart->addChildVertex('HR_RB', \HairPointener\Resources\HumanResource::make('HR_PL', 'P.L.', 'Software Development Manager, TRL'));
 	$hpChart->addChildVertex('HR_PL', \HairPointener\Resources\HumanResource::make('HR_AP', 'A.P.', 'Team Lead, TB'));
 	$hpChart->addChildVertex('HR_AP', \HairPointener\Resources\HumanResource::make('HR_MB', 'M.B.', 'Software Engineer'));
 	$hpChart->addChildVertex('HR_PL', \HairPointener\Resources\HumanResource::make('HR_AR', 'A.R.', 'Team Lead, OJO/APL'));
@@ -55,7 +56,7 @@
 
 	$view = \View\Svg\SimpleAcyclicDigraphTreeView::make($hpChart);
 
-	$xml = $view->makeLayout()->generate()->serializeXml();
+	$xml = $view->makeLayout()->setVertexRectRenderer(\View\Svg\SimpleRectRenderer::make(1, 0.5, 0.1))->generate()->serializeXml();
 
 	print($xml);
 
