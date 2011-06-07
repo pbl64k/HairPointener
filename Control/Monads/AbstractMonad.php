@@ -20,7 +20,9 @@
 			{
 				$m = $this;
 
-				return $this->mbind(${${\FP\f::compose()}(function($x) use($m) { return $m->mreturn($x); })}($f));
+				return $this->mbind(\FP\f::ap(\FP\f::ap(\FP\f::compose(),
+						function($x) use($m) { return $m->mreturn($x); }),
+						$f));
 			}
 		}
 	}

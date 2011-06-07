@@ -40,14 +40,20 @@
 
 			private function checkMreturn(\Control\Monads\ArrayMonad $monad)
 			{
-				$this->assertEquals(array($monad->pierceMonad()), $monad->mreturn($monad->pierceMonad())->pierceMonad());
+				$this->assertEquals(array($monad->pierceMonad()),
+						$monad->mreturn($monad->pierceMonad())->
+						pierceMonad());
 
 				return $monad;
 			}
 
 			private function checkMfmap(\Control\Monads\ArrayMonad $monad)
 			{
-				$this->assertEquals(array_map(function($x) { return 2 * $x; }, $monad->pierceMonad()), $monad->mfmap(function($y) { return $y + $y; })->pierceMonad());
+				$this->assertEquals(
+						array_map(function($x) { return 2 * $x; },
+						$monad->pierceMonad()),
+						$monad->mfmap(function($y) { return $y + $y; })->
+						pierceMonad());
 
 				return $monad;
 			}
@@ -62,7 +68,9 @@
 					$dup[] = $elt;
 				}
 
-				$this->assertEquals($dup, $monad->mbind(function ($x) { return \Control\Monads\ArrayMonad::makeFromArray(array($x, $x)); })->pierceMonad());
+				$this->assertEquals($dup, $monad->mbind(function($x)
+						{ return \Control\Monads\ArrayMonad::makeFromArray(
+						array($x, $x)); })->pierceMonad());
 
 				return $monad;
 			}

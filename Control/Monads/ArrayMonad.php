@@ -31,13 +31,31 @@
 					return self::makeFromArray(array());
 				}
 
-				return self::makeFromArray(call_user_func_array('array_merge', array_map(function($m) { return $m->pierceMonad(); }, $this->array)));
+				return self::makeFromArray(call_user_func_array(
+						'array_merge', array_map(function($m) {
+						return $m->pierceMonad(); }, $this->array)));
 			}
 
 			public function mfmap($f)
 			{
 				return self::makeFromArray(array_map($f, $this->array));
 			}
+
+			/*
+			public function mbind($f)
+			{
+				$array = array_map($f, $this->array);
+
+				if (empty($array))
+				{
+					return self::makeFromArray(array());
+				}
+
+				return self::makeFromArray(call_user_func_array(
+						'array_merge', array_map(function($m) {
+						return $m->pierceMonad(); }, $array)));
+			}
+			*/
 
 			public function mzero()
 			{
@@ -48,7 +66,8 @@
 			{
 				$monad = $this->mplusHelper($m);
 
-				return self::makeFromArray(array_merge($this->pierceMonad(), $monad->pierceMonad()));
+				return self::makeFromArray(array_merge($this->pierceMonad(),
+						$monad->pierceMonad()));
 			}
 
 			protected function mplusHelper(ArrayMonad $m)
